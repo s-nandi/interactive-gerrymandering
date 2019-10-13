@@ -2,7 +2,8 @@ from geometry import make_oriented, \
                      perimeter_area, \
                      convex_hull, \
                      convex_hull_perimeter_area, \
-                     circumcircle_center_radius
+                     circumcircle_center_radius, \
+                     contains
 from math import pi, isclose, sqrt
 from networkx import Graph
 from os.path import join
@@ -64,6 +65,7 @@ class PGraph(Graph):
             G.nodes[index]['population'] = pops[index]
             G.nodes[index]['area'] = areas[index]
             G.nodes[index]['perimeter'] = perimeters[index]
+            G.nodes[index]['color'] = 'white'
             
         voting_data = read_votes(election_path, precinct_name)
         voting_prefixes = read_precinct_prefixes(shape_path)
@@ -189,7 +191,23 @@ class PGraph(Graph):
     def calculate_isoperimetric_quotient(G, subset_indices):
         data = PGraph.calculate_subset_data(G, subset_indices)
         return data.area / data.area_of_circle_with_same_perimeter
-        
-        
-        
+    
+    @staticmethod
+    def calculate_votes(G, subset_indices):
+        d_votes, r_votes = 0
+        for index in subset_indices:
+            voting = G.nodes[index]['tallied_votes']
+            d_votes += voting[Party.dem]
+            r_votes += voting[Party.rep]
+        return d_votes, r_votes
+    
+    @staticmethod
+    def node_containing(G, point):
+        try:
+            for index in G.nodes:
+                if contains(G.nodes[index]['points'], point):
+                    return index
+        except:
+            pass
+        return -1
             
