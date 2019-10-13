@@ -1,5 +1,5 @@
 from nayuki_minimum_enclosing_circle import make_circle
-from shapely.geometry import Polygon, MultiPoint
+from shapely.geometry import Polygon, MultiPoint, Point
 from shapely.geometry.polygon import orient
 from math import pi
 
@@ -14,6 +14,11 @@ def perimeter_area(polygon):
 def convex_hull(points):
     ch = MultiPoint(points).convex_hull
     return list(ch.exterior.coords)
+
+def contains(polygon, point):
+    poly = Polygon(polygon)
+    pt = Point(point)
+    return pt.within(poly)
 
 def convex_hull_perimeter_area(points):
     ch = MultiPoint(points).convex_hull
