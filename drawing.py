@@ -5,14 +5,20 @@ from networkx import draw_spectral
 from itertools import cycle
 from voting_reader import Party
 
-def get_axes(pgraph, figsize = (8, 8)):
-    """ Draws precinct boundaries and returns the created axes """
+
+def get_fig_axes(pgraph, figsize = (8, 8)):
+    """ Draws precinct boundaries and returns the created fig/axes """
     fig, ax = plt.subplots(figsize = figsize)
     for index in pgraph:
         face = pgraph.nodes[index]['points']
         polygon = face + [face[0]]
         x, y = zip(*polygon)
         ax.plot(x, y, color = 'black')
+    return fig, ax
+
+
+def get_axes(pgraph, figsize = (8, 8)):
+    _, ax = get_fig_axes(pgraph, figsize)
     return ax
 
 def show():
@@ -38,6 +44,7 @@ def color_subset(pgraph,
         polygon = face + [face[0]]
         x, y = zip(*polygon)
         ax.fill(x, y, color = color, alpha = alpha)
+        pgraph.nodes[index]['color'] = color
 
 def color_subsets(pgraph,
                   subsets,
@@ -54,7 +61,8 @@ def color_subsets(pgraph,
     for subset, color in zip(subsets, cycle(colors)):
         color_subset(pgraph, subset, ax, color, alpha)
         
-def color_by_votes(pgraph, ax, colors = {Party.dem : 'blue', Party.rep : 'red'}):
+def color_by_votes(pgraph, ax):
+    colors = {Party.dem : 'blue', Party.rep : 'red'}
     for index in pgraph.nodes:
         votes = pgraph.nodes[index]['tallied_votes']
         color = colors[Party.dem] if votes[Party.dem] > votes[Party.rep] else colors[Party.rep]
